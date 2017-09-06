@@ -3,7 +3,6 @@ package org.redisson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.Serializable;
-import java.lang.ref.Reference;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.HashMap;
