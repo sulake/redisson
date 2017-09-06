@@ -1313,6 +1313,7 @@ public class RedissonMapCache<K, V> extends RedissonMap<K, V> implements RMapCac
                         "        local lruItems = redis.call('zrange', lastAccessTimeSetName, 0, cacheSize - maxSize); " +
                         "        for index, lruItem in ipairs(lruItems) do " +
                         "            if lruItem then " +
+                        //"                redis.log(redis.LOG_WARNING, 'evicting ' .. lruItem); " +
                         "                local lruItemValue = redis.call('hget', KEYS[1], lruItem); " +
                         "                redis.call('hdel', KEYS[1], lruItem); " +
                         "                redis.call('zrem', KEYS[2], lruItem); " +

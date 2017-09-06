@@ -259,15 +259,17 @@ public class RedissonMapCacheTest extends BaseMapTest {
         assertThat(map.remove("0")).isNull();
         assertThat(map.remove("3")).isEqualTo("33");
 
-        maxSize.set(4);
+        maxSize.set(6);
         map.setMaxSize(maxSize.get());
         assertThat(map.fastPut("01", "00")).isTrue();
         assertThat(map.fastPut("02", "00")).isTrue();
         assertThat(map.fastPut("03", "00")).isTrue();
         assertThat(map.fastPut("04", "00")).isTrue();
         assertThat(map.fastPut("05", "00")).isTrue();
+        assertThat(map.fastPut("06", "00")).isTrue();
+        assertThat(map.fastPut("07", "00")).isTrue(); // FIXME: fails..
 
-        assertThat(map.size()).isEqualTo(maxSize.get()); // FIXME: fails..
+        assertThat(map.size()).isEqualTo(maxSize.get());
     }
     
     @Test
