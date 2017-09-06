@@ -3,6 +3,7 @@ package org.redisson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.Serializable;
+import java.lang.ref.Reference;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -16,6 +17,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import org.junit.Assert;
@@ -218,16 +220,16 @@ public class RedissonMapCacheTest extends BaseMapTest {
 
     @Test
     public void testMaxSize() {
-        final int maxSize = 2;
+        final AtomicInteger maxSize = new AtomicInteger(2);
         Map<String, String> store = new LinkedHashMap<String, String>() {
             @Override
             protected boolean removeEldestEntry(Entry<String, String> eldest) {
-                return size() > maxSize;
+                return size() > maxSize.get();
             }
         };
         MapOptions<String, String> options = MapOptions.<String, String>defaults().writer(createMapWriter(store));
         RMapCache<String, String> map = redisson.getMapCache("test", options);
-        map.trySetMaxSize(maxSize);
+        map.trySetMaxSize(maxSize.get());
 
         assertThat(map.fastPutIfAbsent("01", "00")).isTrue();
         assertThat(map.fastPutIfAbsent("02", "00")).isTrue();
@@ -237,7 +239,7 @@ public class RedissonMapCacheTest extends BaseMapTest {
         assertThat(map.fastPut("2", "22", 10, TimeUnit.SECONDS)).isTrue();
         assertThat(map.fastPut("3", "33", 10, TimeUnit.SECONDS)).isTrue();
 
-        assertThat(map.size()).isEqualTo(maxSize);
+        assertThat(map.size()).isEqualTo(maxSize.get());
 
         Map<String, String> expected = new HashMap<>();
         expected.put("2", "22");
@@ -257,6 +259,16 @@ public class RedissonMapCacheTest extends BaseMapTest {
         assertThat(map.remove("2", "22")).isTrue();
         assertThat(map.remove("0")).isNull();
         assertThat(map.remove("3")).isEqualTo("33");
+
+        maxSize.set(4);
+        map.setMaxSize(maxSize.get());
+        assertThat(map.fastPut("01", "00")).isTrue();
+        assertThat(map.fastPut("02", "00")).isTrue();
+        assertThat(map.fastPut("03", "00")).isTrue();
+        assertThat(map.fastPut("04", "00")).isTrue();
+        assertThat(map.fastPut("05", "00")).isTrue();
+
+        assertThat(map.size()).isEqualTo(maxSize.get()); // FIXME: fails..
     }
     
     @Test

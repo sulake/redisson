@@ -96,8 +96,24 @@ public class RedissonMapCache<K, V> extends RedissonMap<K, V> implements RMapCac
     }
 
     @Override
-    public boolean trySetMaxSize(int permits) {
-        return get(trySetMaxSizeAsync(permits));
+    public void setMaxSize(int maxSize) {
+        get(setMaxSizeAsync(maxSize));
+    }
+
+    @Override
+    public RFuture<Void> setMaxSizeAsync(int maxSize) {
+        if (maxSize <= 0) {
+            throw new IllegalArgumentException("maxSize should be greater than zero");
+        }
+
+        return commandExecutor.evalWriteAsync(getName(), LongCodec.INSTANCE, RedisCommands.EVAL_BOOLEAN,
+                "redis.call('hset', KEYS[1], 'max-size', ARGV[1]); ",
+                Arrays.<Object>asList(getOptionsName()), maxSize);
+    }
+
+    @Override
+    public boolean trySetMaxSize(int maxSize) {
+        return get(trySetMaxSizeAsync(maxSize));
     }
     
     @Override
