@@ -363,8 +363,8 @@ public class RedissonMapCache<K, V> extends RedissonMap<K, V> implements RMapCac
                             "    local lastAccessTimeSetName = KEYS[5]; " +
                             "    redis.call('zadd', lastAccessTimeSetName, currentTime, ARGV[5]); " +
                             "    local cacheSize = tonumber(redis.call('hlen', KEYS[1])); " +
-                            "    if cacheSize >= maxSize then " +
-                            "        local lruItems = redis.call('zrange', lastAccessTimeSetName, 0, cacheSize - maxSize); " +
+                            "    if cacheSize > maxSize then " +
+                            "        local lruItems = redis.call('zrange', lastAccessTimeSetName, 0, -maxSize-1); " +
                             "        for index, lruItem in ipairs(lruItems) do " +
                             "            if lruItem then " +
                             "                local lruItemValue = redis.call('hget', KEYS[1], lruItem); " +
@@ -531,8 +531,8 @@ public class RedissonMapCache<K, V> extends RedissonMap<K, V> implements RMapCac
                 "    if maxSize ~= nil and maxSize ~= 0 then" +
                 "        redis.call('zadd', lastAccessTimeSetName, currentTime, ARGV[2]);" +
                 "        local cacheSize = tonumber(redis.call('hlen', KEYS[1]));" +
-                "        if cacheSize >= maxSize then" +
-                "            local lruItems = redis.call('zrange', lastAccessTimeSetName, 0, cacheSize - maxSize);" +
+                "        if cacheSize > maxSize then" +
+                "            local lruItems = redis.call('zrange', lastAccessTimeSetName, 0, -maxSize-1);" +
                 "            for index, lruItem in ipairs(lruItems) do" +
                 "                if lruItem then" +
                 "                    local lruItemValue = redis.call('hget', KEYS[1], lruItem);" +
@@ -600,8 +600,8 @@ public class RedissonMapCache<K, V> extends RedissonMap<K, V> implements RMapCac
                         + "if maxSize ~= nil and maxSize ~= 0 then " +
                         "    redis.call('zadd', lastAccessTimeSetName, currentTime, ARGV[2]); " +
                         "    local cacheSize = tonumber(redis.call('hlen', KEYS[1])); " +
-                        "    if cacheSize >= maxSize then " +
-                        "        local lruItems = redis.call('zrange', lastAccessTimeSetName, 0, cacheSize - maxSize); " +
+                        "    if cacheSize > maxSize then " +
+                        "        local lruItems = redis.call('zrange', lastAccessTimeSetName, 0, -maxSize-1); " +
                         "        for index, lruItem in ipairs(lruItems) do " +
                         "            if lruItem then " +
                         "                local lruItemValue = redis.call('hget', KEYS[1], lruItem); " +
@@ -678,8 +678,8 @@ public class RedissonMapCache<K, V> extends RedissonMap<K, V> implements RMapCac
                         "    local lastAccessTimeSetName = KEYS[6]; " +
                         "    redis.call('zadd', lastAccessTimeSetName, currentTime, ARGV[2]); " +
                         "    local cacheSize = tonumber(redis.call('hlen', KEYS[1])); " +
-                        "    if cacheSize >= maxSize then " +
-                        "        local lruItems = redis.call('zrange', lastAccessTimeSetName, 0, cacheSize - maxSize); " +
+                        "    if cacheSize > maxSize then " +
+                        "        local lruItems = redis.call('zrange', lastAccessTimeSetName, 0, -maxSize-1); " +
                         "        for index, lruItem in ipairs(lruItems) do " +
                         "            if lruItem then " +
                         "                local lruItemValue = redis.call('hget', KEYS[1], lruItem); " +
@@ -810,8 +810,8 @@ public class RedissonMapCache<K, V> extends RedissonMap<K, V> implements RMapCac
                         "    local lastAccessTimeSetName = KEYS[6]; " +
                         "    redis.call('zadd', lastAccessTimeSetName, currentTime, ARGV[5]); " +
                         "    local cacheSize = tonumber(redis.call('hlen', KEYS[1])); " +
-                        "    if cacheSize >= maxSize then " +
-                        "        local lruItems = redis.call('zrange', lastAccessTimeSetName, 0, cacheSize - maxSize); " +
+                        "    if cacheSize > maxSize then " +
+                        "        local lruItems = redis.call('zrange', lastAccessTimeSetName, 0, -maxSize-1); " +
                         "        for index, lruItem in ipairs(lruItems) do " +
                         "            if lruItem then " +
                         "                local lruItemValue = redis.call('hget', KEYS[1], lruItem); " +
@@ -946,8 +946,8 @@ public class RedissonMapCache<K, V> extends RedissonMap<K, V> implements RMapCac
                         "    local lastAccessTimeSetName = KEYS[6]; " +
                         "    redis.call('zadd', lastAccessTimeSetName, currentTime, ARGV[5]); " +
                         "    local cacheSize = tonumber(redis.call('hlen', KEYS[1])); " +
-                        "    if cacheSize >= maxSize then " +
-                        "        local lruItems = redis.call('zrange', lastAccessTimeSetName, 0, cacheSize - maxSize); " +
+                        "    if cacheSize > maxSize then " +
+                        "        local lruItems = redis.call('zrange', lastAccessTimeSetName, 0, -maxSize-1); " +
                         "        for index, lruItem in ipairs(lruItems) do " +
                         "            if lruItem then " +
                         "                local lruItemValue = redis.call('hget', KEYS[1], lruItem); " +
@@ -1306,11 +1306,10 @@ public class RedissonMapCache<K, V> extends RedissonMap<K, V> implements RMapCac
                         "    local lastAccessTimeSetName = KEYS[6]; " +
                         "    redis.call('zadd', lastAccessTimeSetName, currentTime, ARGV[2]); " +
                         "    local cacheSize = tonumber(redis.call('hlen', KEYS[1])); " +
-                        "    if cacheSize >= maxSize then " +
-                        "        local lruItems = redis.call('zrange', lastAccessTimeSetName, 0, cacheSize - maxSize); " +
+                        "    if cacheSize > maxSize then " +
+                        "        local lruItems = redis.call('zrange', lastAccessTimeSetName, 0, -maxSize-1); " +
                         "        for index, lruItem in ipairs(lruItems) do " +
                         "            if lruItem then " +
-                        //"                redis.log(redis.LOG_WARNING, 'evicting ' .. lruItem); " +
                         "                local lruItemValue = redis.call('hget', KEYS[1], lruItem); " +
                         "                redis.call('hdel', KEYS[1], lruItem); " +
                         "                redis.call('zrem', KEYS[2], lruItem); " +
@@ -1357,8 +1356,8 @@ public class RedissonMapCache<K, V> extends RedissonMap<K, V> implements RMapCac
                             "if maxSize ~= nil and maxSize ~= 0 then " +
                             "    redis.call('zadd', lastAccessTimeSetName, currentTime, ARGV[2]); " +
                             "    local cacheSize = tonumber(redis.call('hlen', KEYS[1])); " +
-                            "    if cacheSize >= maxSize then " +
-                            "        local lruItems = redis.call('zrange', lastAccessTimeSetName, 0, cacheSize - maxSize); " +
+                            "    if cacheSize > maxSize then " +
+                            "        local lruItems = redis.call('zrange', lastAccessTimeSetName, 0, -maxSize-1); " +
                             "        for index, lruItem in ipairs(lruItems) do " +
                             "            if lruItem then " +
                             "                local lruItemValue = redis.call('hget', KEYS[1], lruItem); " +
@@ -1503,8 +1502,8 @@ public class RedissonMapCache<K, V> extends RedissonMap<K, V> implements RMapCac
                         "        local lastAccessTimeSetName = KEYS[5]; " +
                         "        redis.call('zadd', lastAccessTimeSetName, currentTime, ARGV[5]); " +
                         "        local cacheSize = tonumber(redis.call('hlen', KEYS[1])); " +
-                        "        if cacheSize >= maxSize then " +
-                        "            local lruItems = redis.call('zrange', lastAccessTimeSetName, 0, cacheSize - maxSize); " +
+                        "        if cacheSize > maxSize then " +
+                        "            local lruItems = redis.call('zrange', lastAccessTimeSetName, 0, -maxSize-1); " +
                         "            for index, lruItem in ipairs(lruItems) do " +
                         "                if lruItem then " +
                         "                    local lruItemValue = redis.call('hget', KEYS[1], lruItem); " +
@@ -1664,8 +1663,8 @@ public class RedissonMapCache<K, V> extends RedissonMap<K, V> implements RMapCac
                         "    if maxSize ~= nil and maxSize ~= 0 then" +
                         "        redis.call('zadd', lastAccessTimeSetName, currentTime, key);" +
                         "        local cacheSize = tonumber(redis.call('hlen', KEYS[1]));" +
-                        "        if cacheSize >= maxSize then" +
-                        "            local lruItems = redis.call('zrange', lastAccessTimeSetName, 0, cacheSize - maxSize);" +
+                        "        if cacheSize > maxSize then" +
+                        "            local lruItems = redis.call('zrange', lastAccessTimeSetName, 0, -maxSize-1);" +
                         "            for index, lruItem in ipairs(lruItems) do" +
                         "                if lruItem then" +
                         "                    local lruItemValue = redis.call('hget', KEYS[1], lruItem);" +

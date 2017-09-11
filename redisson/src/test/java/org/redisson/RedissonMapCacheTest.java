@@ -261,15 +261,27 @@ public class RedissonMapCacheTest extends BaseMapTest {
 
         maxSize.set(6);
         map.setMaxSize(maxSize.get());
-        assertThat(map.fastPut("01", "00")).isTrue();
-        assertThat(map.fastPut("02", "00")).isTrue();
-        assertThat(map.fastPut("03", "00")).isTrue();
-        assertThat(map.fastPut("04", "00")).isTrue();
-        assertThat(map.fastPut("05", "00")).isTrue();
-        assertThat(map.fastPut("06", "00")).isTrue();
-        assertThat(map.fastPut("07", "00")).isTrue(); // FIXME: fails..
+        assertThat(map.fastPut("01", "01")).isTrue();
+        assertThat(map.fastPut("02", "02")).isTrue();
+        assertThat(map.fastPut("03", "03")).isTrue();
+        assertThat(map.fastPut("04", "04")).isTrue();
+        assertThat(map.fastPut("05", "05")).isTrue();
+        assertThat(map.fastPut("06", "06")).isTrue();
+        assertThat(map.fastPut("07", "07")).isTrue();
+        assertThat(map.fastPut("08", "08")).isTrue();
+        assertThat(map.fastPut("09", "09")).isTrue();
+        assertThat(map.fastPut("01", "01")).isTrue();
+
+        assertThat(map.containsKey("01")); // test refreshed ttl
+        assertThat(map.size()).isEqualTo(maxSize.get());
+
+        maxSize.set(1);
+        map.setMaxSize(maxSize.get());
+        assertThat(map.fastPut("01", "00")).isFalse();
+        assertThat(map.fastPut("02", "22")).isTrue();
 
         assertThat(map.size()).isEqualTo(maxSize.get());
+        assertThat(map.get("02")).isEqualTo("22");
     }
     
     @Test
