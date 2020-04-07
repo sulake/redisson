@@ -53,6 +53,7 @@ import org.redisson.client.protocol.convertor.NumberConvertor;
 import org.redisson.client.protocol.decoder.MapScanResult;
 import org.redisson.command.CommandAsyncExecutor;
 import org.redisson.connection.decoder.MapGetAllDecoder;
+import org.redisson.iterator.RedissonMapAsyncIterator;
 import org.redisson.iterator.RedissonMapIterator;
 import org.redisson.mapreduce.RedissonMapReduce;
 import org.redisson.misc.RPromise;
@@ -451,6 +452,11 @@ public class RedissonMap<K, V> extends RedissonExpirable implements RMap<K, V> {
     @Override
     public Collection<V> values(int count) {
         return values(null, count);
+    }
+
+    @Override
+    public AsyncIterator<java.util.Map.Entry<K, V>> entrySetAsync(String keyPattern, int count) {
+        return new AsyncEntrySet(keyPattern, count);
     }
     
     @Override
@@ -1214,6 +1220,10 @@ public class RedissonMap<K, V> extends RedissonExpirable implements RMap<K, V> {
         return new RedissonMapIterator<>(RedissonMap.this, pattern, count);
     }
 
+    protected AsyncIterator<Map.Entry<K, V>> asyncEntryIterator(String pattern, int count) {
+        return new RedissonMapAsyncIterator<>(RedissonMap.this, pattern, count);
+    }
+
     private void loadValue(K key, RPromise<V> result, boolean replaceValue) {
         RLock lock = getLock(key);
         long threadId = Thread.currentThread().getId();
@@ -1287,6 +1297,25 @@ public class RedissonMap<K, V> extends RedissonExpirable implements RMap<K, V> {
             
             result.trySuccess(value);
         });
+    }
+
+    final class AsyncEntrySet implements AsyncIterator<Entry<K, V>> {
+
+        private final AsyncIterator<Entry<K, V>> asyncIterator;
+
+        AsyncEntrySet(String keyPattern, int count) {
+            this.asyncIterator = asyncEntryIterator(keyPattern, count);
+        }
+
+        @Override
+        public RFuture<Boolean> hasNext() {
+            return asyncIterator.hasNext();
+        }
+
+        @Override
+        public RFuture<Entry<K, V>> next() {
+            return asyncIterator.next();
+        }
     }
 
     final class EntrySet extends AbstractSet<Map.Entry<K, V>> {

@@ -15,6 +15,7 @@
  */
 package org.redisson.api;
 
+import org.redisson.AsyncIterator;
 import org.redisson.api.map.MapLoader;
 import org.redisson.api.map.MapWriter;
 
@@ -318,4 +319,22 @@ public interface RMapAsync<K, V> extends RExpirableAsync {
      */
     RFuture<V> putIfAbsentAsync(K key, V value);
 
+    /**
+     * Returns map entries collection.
+     * Map entries are loaded in batch. Batch size is defined by <code>count</code> param.
+     * If <code>keyPattern</code> is not null then only entries mapped by matched keys of this pattern are loaded.
+     *
+     *  Supported glob-style patterns:
+     *  <p>
+     *    h?llo subscribes to hello, hallo and hxllo
+     *    <p>
+     *    h*llo subscribes to hllo and heeeello
+     *    <p>
+     *    h[ae]llo subscribes to hello and hallo, but not hillo
+     *
+     * @param keyPattern - key pattern
+     * @param count - size of entries batch
+     * @return map entries collection
+     */
+    AsyncIterator<Entry<K, V>> entrySetAsync(String keyPattern, int count);
 }
